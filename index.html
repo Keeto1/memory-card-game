@@ -7,6 +7,16 @@
   <style>
     :root {
       --bg: #0b1220;
+      --panel-bg: rgba(13,20,33,0.95);
+      --board-bg: rgba(15,24,41,0.95);
+      --score-bg: rgba(255,255,255,0.05);
+      --score-border: rgba(255,255,255,0.08);
+      --control-bg: rgba(255,255,255,0.07);
+      --control-focus: rgba(72, 158, 248, 0.16);
+      --victory-bg: rgba(7,15,29,0.98);
+      --modal-bg: rgba(6,12,24,0.82);
+      --card-back-start: rgba(124,231,185,0.25);
+      --card-back-end: #12203a;
       --card-bg: #151f33;
       --card-face: #f7f8fb;
       --accent: #7ce7b9;
@@ -16,10 +26,6 @@
       --shadow: 0 20px 45px rgba(0,0,0,0.25);
       --highlight: #ffd56b;
       font-family: Inter, system-ui, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
     }
 
     body {
@@ -32,6 +38,29 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
+    }
+
+    body.light-mode {
+      --bg: #eff6ff;
+      --panel-bg: rgba(255,255,255,0.88);
+      --board-bg: rgba(255,255,255,0.96);
+      --score-bg: rgba(255,255,255,0.82);
+      --score-border: rgba(148,163,184,0.18);
+      --control-bg: rgba(255,255,255,0.92);
+      --control-focus: rgba(59,130,246,0.32);
+      --victory-bg: rgba(255,255,255,0.98);
+      --modal-bg: rgba(226,232,240,0.92);
+      --card-back-start: rgba(59,130,246,0.16);
+      --card-back-end: #dbeafe;
+      --text: #102a43;
+      --muted: #475569;
+      --shadow: 0 20px 45px rgba(15,42,75,0.12);
+      background: radial-gradient(circle at top, rgba(59,130,246,0.12), transparent 24%),
+                  linear-gradient(180deg, #f8fafc 0%, #e2e8f0 55%, #f8fafc 100%);
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     .app-shell {
@@ -48,10 +77,11 @@
       align-items: center;
       padding: 22px;
       border-radius: 28px;
-      background: rgba(13,20,33,0.95);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--panel-bg);
+      border: 1px solid var(--score-border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
+      color: var(--text);
     }
 
     .panel h1 {
@@ -77,9 +107,29 @@
       border: none;
       border-radius: 14px;
       padding: 12px 16px;
-      background: rgba(255,255,255,0.07);
+      background: var(--control-bg);
       color: var(--text);
       outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      min-width: 130px;
+    }
+
+    .controls select option {
+      background: var(--control-bg);
+      color: var(--text);
+    }
+
+    .controls select:focus {
+      box-shadow: inset 0 0 0 1px var(--control-focus);
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
     }
 
     .controls button {
@@ -102,10 +152,11 @@
     .score-card {
       position: relative;
       border-radius: 18px;
-      background: rgba(255,255,255,0.05);
+      background: var(--score-bg);
       padding: 18px 16px;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid var(--score-border);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      color: var(--text);
     }
 
     .score-card strong {
@@ -134,11 +185,12 @@
       position: relative;
       padding: 14px;
       border-radius: 30px;
-      background: rgba(15,24,41,0.95);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--board-bg);
+      border: 1px solid var(--score-border);
       box-shadow: var(--shadow);
       max-width: min(1250px, calc(100vw - 48px));
       margin: 0 auto;
+      overflow: hidden;
     }
 
     .board {
@@ -151,7 +203,7 @@
     .card {
       position: relative;
       width: 100%;
-      max-width: 160px;
+      max-width: clamp(110px, 14vw, 160px);
       aspect-ratio: 4 / 5;
       transform-style: preserve-3d;
       transition: transform 450ms ease;
@@ -177,6 +229,7 @@
       backface-visibility: hidden;
       overflow: hidden;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 22px 40px rgba(0,0,0,0.22);
+      color: var(--text);
     }
 
     .card-front {
@@ -186,9 +239,9 @@
     }
 
     .card-back {
-      background: radial-gradient(circle at 30% 20%, rgba(124,231,185,0.25), transparent 32%),
-                  linear-gradient(180deg, #1b2744 0%, #12203a 100%);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: radial-gradient(circle at 30% 20%, var(--card-back-start), transparent 32%),
+                  linear-gradient(180deg, #1b2744 0%, var(--card-back-end) 100%);
+      border: 1px solid var(--score-border);
     }
 
     .card-back::before {
@@ -203,6 +256,29 @@
 
     .match-glow {
       animation: glowBurst 600ms ease-out forwards;
+    }
+
+    .match-popup {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translate(-50%, -50%) scale(0.96);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(124,231,185,0.95);
+      color: #08121e;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    body.light-mode .match-popup {
+      background: rgba(59,130,246,0.95);
+      color: #ffffff;
     }
 
     @keyframes glowBurst {
@@ -254,7 +330,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(6,12,24,0.82);
+      background: var(--modal-bg);
       z-index: 99;
       padding: 24px;
     }
@@ -267,10 +343,11 @@
       width: min(520px, 100%);
       border-radius: 28px;
       padding: 28px;
-      background: rgba(7,15,29,0.98);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--victory-bg);
+      border: 1px solid var(--score-border);
       box-shadow: 0 40px 80px rgba(0,0,0,0.35);
       text-align: center;
+      color: var(--text);
     }
 
     .victory-card h2 {
@@ -288,9 +365,13 @@
       display: flex;
       justify-content: space-between;
       padding: 12px 16px;
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.08);
       border-radius: 14px;
       font-size: 0.98rem;
+    }
+
+    body.light-mode .victory-card .stats div {
+      background: rgba(15,23,42,0.06);
     }
 
     .victory-card button {
@@ -308,9 +389,19 @@
       transform: translateY(-2px);
     }
 
-    @media (max-width: 760px) {
-      .scoreboard { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+    @media (max-width: 900px) {
+      .scoreboard { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
       .controls { width: 100%; justify-content: space-between; }
+      .board { gap: 12px; }
+      .card { max-width: clamp(90px, 18vw, 140px); }
+      .panel { gap: 12px; }
+    }
+
+    @media (max-width: 760px) {
+      .scoreboard { grid-template-columns: repeat(2, minmax(100px, 1fr)); }
+      .controls { width: 100%; justify-content: space-between; }
+      .board { gap: 10px; }
+      .card { max-width: clamp(80px, 18vw, 130px); }
       .panel { gap: 12px; }
     }
   </style>
@@ -339,6 +430,7 @@
             <option value="flags">Flags</option>
           </select>
         </label>
+        <button id="theme-toggle" class="mode-toggle" type="button" aria-label="Toggle light and dark mode">Light Mode</button>
         <button id="new-game-btn" type="button">New Game</button>
       </div>
     </section>
@@ -394,6 +486,8 @@
     const victoryPairs = document.getElementById('victory-pairs');
     const victoryTime = document.getElementById('victory-time');
     const replayBtn = document.getElementById('replay-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const bodyEl = document.body;
 
     const themeSets = {
       animals: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵'],
@@ -454,6 +548,27 @@
       setTimeout(() => bestScoreLabel.classList.remove('score-pop'), 500);
     }
 
+    function setMode(mode) {
+      if (mode === 'light') {
+        bodyEl.classList.add('light-mode');
+        themeToggle.textContent = 'Dark Mode';
+      } else {
+        bodyEl.classList.remove('light-mode');
+        themeToggle.textContent = 'Light Mode';
+      }
+      localStorage.setItem('memory-site-mode', mode);
+    }
+
+    function toggleMode() {
+      const nextMode = bodyEl.classList.contains('light-mode') ? 'dark' : 'light';
+      setMode(nextMode);
+    }
+
+    function loadMode() {
+      const savedMode = localStorage.getItem('memory-site-mode') || 'dark';
+      setMode(savedMode);
+    }
+
     function formatTime(seconds) {
       const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
       const ss = String(seconds % 60).padStart(2, '0');
@@ -484,10 +599,17 @@
       return deck;
     }
 
+    function getColumnMinWidth(cols) {
+      const gap = window.innerWidth <= 760 ? 10 : 12;
+      const available = Math.max(window.innerWidth - 56, 240);
+      const ideal = Math.floor((available - gap * (cols - 1)) / cols);
+      return Math.max(50, Math.min(120, ideal));
+    }
+
     function renderBoard() {
       board.innerHTML = '';
       const { rows, cols } = difficulties[difficultySelect.value];
-      board.style.gridTemplateColumns = `repeat(${cols}, minmax(120px, 1fr))`;
+      board.style.gridTemplateColumns = `repeat(${cols}, minmax(${getColumnMinWidth(cols)}px, 1fr))`;
       const cards = pickCards();
 
       cards.forEach((symbol, index) => {
@@ -505,6 +627,13 @@
         board.appendChild(card);
       });
     }
+
+    function updateGridColumns() {
+      const { cols } = difficulties[difficultySelect.value];
+      board.style.gridTemplateColumns = `repeat(${cols}, minmax(${getColumnMinWidth(cols)}px, 1fr))`;
+    }
+
+    window.addEventListener('resize', updateGridColumns);
 
     function handleCardFlip(event) {
       const card = event.currentTarget;
@@ -566,6 +695,8 @@
       setTimeout(() => matchedCount.classList.remove('score-pop'), 500);
     }
 
+    const matchWords = ['Nice!', 'Perfect!', 'Great!', 'Awesome!', 'Matched!', 'Boom!', 'Sweet!', 'Yes!'];
+
     function triggerMatchEffects(cardA, cardB) {
       [cardA, cardB].forEach(card => {
         card.classList.add('match-glow', 'match-shake', 'match-flash');
@@ -574,6 +705,33 @@
         }, 700);
         spawnParticles(card);
       });
+      spawnMatchPopup(cardA);
+    }
+
+    function spawnMatchPopup(card) {
+      const message = matchWords[Math.floor(Math.random() * matchWords.length)];
+      const popup = document.createElement('div');
+      popup.className = 'match-popup';
+      popup.textContent = message;
+
+      const rect = card.getBoundingClientRect();
+      const boardRect = board.getBoundingClientRect();
+      popup.style.left = `${rect.left + rect.width / 2 - boardRect.left}px`;
+      popup.style.top = `${rect.top + rect.height * 0.15 - boardRect.top}px`;
+      board.appendChild(popup);
+
+      const animation = popup.animate([
+        { opacity: 0, transform: 'translate(-50%, -50%) translateY(0) scale(0.95)' },
+        { opacity: 1, transform: 'translate(-50%, -50%) translateY(-18px) scale(1.05)' },
+        { opacity: 1, transform: 'translate(-50%, -50%) translateY(-18px) scale(1.05)' },
+        { opacity: 0, transform: 'translate(-50%, -50%) translateY(-36px) scale(1.1)' }
+      ], {
+        duration: 1600,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        fill: 'forwards'
+      });
+
+      animation.onfinish = () => popup.remove();
     }
 
     function spawnParticles(card) {
@@ -659,12 +817,14 @@
     themeSelect.addEventListener('change', () => {
       resetGame();
     });
+    themeToggle.addEventListener('click', toggleMode);
     newGameBtn.addEventListener('click', resetGame);
     replayBtn.addEventListener('click', resetGame);
     victoryModal.addEventListener('click', (event) => {
       if (event.target === victoryModal) resetGame();
     });
 
+    loadMode();
     resetGame();
   </script>
 </body>
